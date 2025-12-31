@@ -13,19 +13,32 @@ export function useWebSocket(serverUrl: string, token: string | null) {
   const [terminalReady, setTerminalReady] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const reconnectAttemptsRef = useRef<number>(0);
   const messageHandlersRef = useRef<Map<string, (data: unknown) => void>>(new Map());
 
   const connect = useCallback(() => {
-    if (!token || wsRef.current?.readyState === WebSocket.OPEN) {
+    if (!token) {
       return;
     }
 
+    // Cerrar conexión existente si la hay
+    if (wsRef.current) {
+      if (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING) {
+        return; // Ya está conectado o conectándose
+      }
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+
     try {
-      const ws = new WebSocket(`${serverUrl}/ws?token=${token}`);
+      // Convertir http:// a ws:// y https:// a wss://
+      const wsUrl = serverUrl.replace(/^http/, 'ws');
+      const ws = new WebSocket(`${wsUrl}/ws?token=${token}`);
 
       ws.onopen = () => {
         console.log('WebSocket connected');
         setIsConnected(true);
+        reconnectAttemptsRef.current = 0; // Reset contador al conectar exitosamente
 
         ws.send(JSON.stringify({ type: 'system:subscribe' }));
       };
@@ -55,14 +68,18 @@ export function useWebSocket(serverUrl: string, token: string | null) {
         console.error('WebSocket error:', error);
       };
 
-      ws.onclose = () => {
-        console.log('WebSocket disconnected');
+      ws.onclose = (event) => {
+        console.log('WebSocket disconnected', event.code, event.reason);
         setIsConnected(false);
         setTerminalReady(false);
+        wsRef.current = null;
 
-        reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
-        }, 3000);
+        // Solo reconectar si no fue un cierre normal o de autenticación
+        if (event.code !== 1000 && event.code !== 1008 && token) {
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connect();
+          }, 3000);
+        }
       };
 
       wsRef.current = ws;
@@ -105,7 +122,7 @@ export function useWebSocket(serverUrl: string, token: string | null) {
   }, [sendMessage]);
 
   const onTerminalData = useCallback((handler: (data: string) => void) => {
-    messageHandlersRef.current.set('terminal:data', handler);
+    messageHandlersRef.current.set('terminal:data', handler as (data: unknown) => void);
   }, []);
 
   return {
