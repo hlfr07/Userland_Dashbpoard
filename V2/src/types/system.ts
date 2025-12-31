@@ -1,0 +1,89 @@
+export interface ChartPoint {
+  value: number;
+  time: string;
+}
+
+export interface SystemData {
+  cpu: number;
+  cpuHistory?: ChartPoint[];
+  memory: {
+    total: number;
+    used: number;
+    free: number;
+    usagePercent: number;
+  };
+  memoryHistory?: ChartPoint[];
+  disk: {
+    total: string;
+    used: string;
+    available: string;
+    usagePercent: number;
+  };
+  diskHistory?: ChartPoint[];
+  swap: {
+    total: number;
+    used: number;
+    free: number;
+    usagePercent: number;
+  };
+  load: {
+    load1: string;
+    load5: string;
+    load15: string;
+  };
+  processes: Process[];
+  ports: Port[];
+  temperature: {
+    current: string;
+    available: boolean;
+  };
+  info: {
+    hostname: string;
+    platform: string;
+    arch: string;
+    uptime: number;
+    cpus: number;
+  };
+  cpuDetails?: {
+    architecture: string;
+    cpuOpModes: string;
+    byteOrder: string;
+    cpuCount: string;
+    onlineCpus: string;
+    vendorId: string;
+    modelName: string;
+    threadsPerCore: string;
+    coresPerSocket: string;
+    sockets: string;
+    cpuMaxMhz: string;
+    cpuMinMhz: string;
+    flags: string;
+  };
+  timestamp: number;
+}
+
+export interface Process {
+  user: string;
+  pid: string;
+  cpu: string;
+  mem: string;
+  vsz: string;
+  rss: string;
+  tty: string;
+  stat: string;
+  start: string;
+  time: string;
+  command: string;
+}
+
+export interface Port {
+  protocol: string;
+  port: string;
+  address: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  username: string;
+  message: string;
+}
