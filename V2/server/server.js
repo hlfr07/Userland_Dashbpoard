@@ -11,6 +11,11 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Credenciales del sistema (configurables por entorno). Esto permite usar
+// las mismas credenciales que usas por SSH en userland sin exponer IP en el login.
+const VALID_USER = process.env.DASH_USER || process.env.USER || 'userland';
+const VALID_PASS = process.env.DASH_PASS || 'userland';
+
 let authenticatedUsers = new Map();
 
 app.post('/api/auth/login', async (req, res) => {
@@ -18,6 +23,10 @@ app.post('/api/auth/login', async (req, res) => {
 
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password required' });
+  }
+
+  if (username !== VALID_USER || password !== VALID_PASS) {
+    return res.status(401).json({ error: 'Invalid credentials' });
   }
 
   const token = Buffer.from(`${username}:${Date.now()}`).toString('base64');
@@ -89,13 +98,9 @@ app.get('/api/system/processes', authenticateRequest, async (req, res) => {
   }
 });
 
+// Nota: en userland/proot no tenemos netlink para listar puertos; devolvemos vacío.
 app.get('/api/system/ports', authenticateRequest, async (req, res) => {
-  try {
-    const ports = await systemMonitor.getOpenPorts();
-    res.json(ports);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  res.json([]);
 });
 
 app.get('/api/health', (req, res) => {

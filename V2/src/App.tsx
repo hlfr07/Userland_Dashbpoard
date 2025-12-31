@@ -1,15 +1,13 @@
-import { useState } from 'react';
 import { Login } from './components/Login';
 import { Dashboard } from './components/Dashboard';
 import { useAuth } from './hooks/useAuth';
 
 function App() {
-  // const [serverUrl, setServerUrl] = useState(`http://${window.location.hostname}:3001`);
-  const [serverUrl, setServerUrl] = useState(`http://192.168.1.22:3001`);
+  // Usa URL pública si existe (VITE_API_URL) o el mismo host con puerto 3001
+  const serverUrl = (import.meta as any).env?.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:3001`;
   const { token, username, isAuthenticated, isLoading, error, login, logout } = useAuth(serverUrl);
 
-  const handleLogin = async (user: string, password: string, url: string) => {
-    setServerUrl(url);
+  const handleLogin = async (user: string, password: string) => {
     return await login(user, password);
   };
 
