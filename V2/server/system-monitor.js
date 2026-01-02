@@ -18,30 +18,22 @@ function addToHistory(array, value) {
   }
 }
 
-let lastCpu = os.cpus();
+export async function getCPUUsage() {
+  try {
+    const { stdout } = await execAsync(
+      `ps -A -o %cpu | awk '{sum+=$1} END {printf "%.1f", sum}'`
+    );
 
-export function getCPUUsage() {
-  const current = os.cpus();
+    const cpu = parseFloat(stdout.trim());
 
-  let idle = 0;
-  let total = 0;
+    // Protección
+    if (isNaN(cpu)) return 0;
 
-  current.forEach((cpu, i) => {
-    const prev = lastCpu[i];
-
-    const prevTotal = Object.values(prev.times).reduce((a, b) => a + b, 0);
-    const currTotal = Object.values(cpu.times).reduce((a, b) => a + b, 0);
-
-    total += currTotal - prevTotal;
-    idle += cpu.times.idle - prev.times.idle;
-  });
-
-  lastCpu = current;
-
-  // 🔐 protección clave
-  if (total === 0) return 0;
-
-  return Math.round(100 - (idle / total) * 100);
+    return cpu;
+  } catch (err) {
+    console.error('CPU error:', err.message);
+    return 0;
+  }
 }
 
 export async function getMemoryUsage() {
