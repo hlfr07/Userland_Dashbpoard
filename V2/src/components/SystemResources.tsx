@@ -1,8 +1,8 @@
-import { Cpu, Activity, Thermometer, Server, TrendingUp, Zap } from 'lucide-react';
+import { Activity, Cpu, Server, TrendingUp, Zap } from 'lucide-react';
 import { SystemData } from '../types/system';
-import { ResourceChart } from './charts/ResourceChart';
-import { DiskChart } from './charts/DiskChart';
 import { CPUInfoCard } from './charts/CPUInfoCard';
+import { DiskChart } from './charts/DiskChart';
+import { ResourceChart } from './charts/ResourceChart';
 
 interface SystemResourcesProps {
   data: SystemData | null;
