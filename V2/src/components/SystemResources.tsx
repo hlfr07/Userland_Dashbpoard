@@ -6,6 +6,7 @@ import { ResourceChart } from './charts/ResourceChart';
 import { CPUFrequencyCard } from './charts/CPUFrequencyCard';
 import { BatteryChart } from './charts/BatteryChart';
 import { DiskUsageChart } from './charts/DiskUsageChart';
+import { LoadingSpinner } from './LoadingSpinner';
 
 interface SystemResourcesProps {
   data: SystemData | null;
@@ -60,14 +61,11 @@ function StatMetric({ icon: Icon, label, value, unit, color }: { icon: typeof Fi
 }
 
 export function SystemResources({ data, deviceInfo, batteryInfo, temperatureInfo }: SystemResourcesProps) {
-  if (!data) {
-    return (
-      <div className="space-y-6 animate-pulse">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="bg-slate-800/50 border border-slate-700/50 rounded-xl h-64"></div>
-        ))}
-      </div>
-    );
+  // Mostrar loader si falta algún dato crítico
+  const isLoading = !data || !deviceInfo || !batteryInfo;
+
+  if (isLoading) {
+    return <LoadingSpinner />;
   }
 
   return (
