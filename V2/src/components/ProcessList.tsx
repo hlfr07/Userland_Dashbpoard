@@ -20,8 +20,8 @@ export function ProcessList({ data }: ProcessListProps) {
         <div className="p-3 sm:p-5 border-b border-slate-700/50">
           <div className="flex items-center gap-3">
             <FiList className="w-5 h-5 text-slate-400" />
-            <h2 className="text-base sm:text-lg font-semibold text-white">Top Processes</h2>
-            <span className="ml-auto text-xs sm:text-sm text-slate-500">{data.processes?.length || 0} processes</span>
+            <h2 className="text-base sm:text-lg font-semibold text-white">Procesos Principales</h2>
+            <span className="ml-auto text-xs sm:text-sm text-slate-500">{data.processes?.length || 0} procesos</span>
           </div>
         </div>
 
@@ -30,10 +30,10 @@ export function ProcessList({ data }: ProcessListProps) {
             <thead className="bg-slate-900/50">
               <tr>
                 <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">PID</th>
-                <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider hidden sm:table-cell">User</th>
+                <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider hidden sm:table-cell">Usuario</th>
                 <th className="px-2 sm:px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">CPU%</th>
                 <th className="px-2 sm:px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">MEM%</th>
-                <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Command</th>
+                <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Comando</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700/50">
@@ -66,8 +66,8 @@ export function ProcessList({ data }: ProcessListProps) {
           <div className="p-3 sm:p-5 border-b border-slate-700/50">
             <div className="flex items-center gap-3">
               <FiWifi className="w-5 h-5 text-slate-400" />
-              <h2 className="text-base sm:text-lg font-semibold text-white">Open Ports</h2>
-              <span className="ml-auto text-xs sm:text-sm text-slate-500">{data.ports?.length || 0} ports</span>
+              <h2 className="text-base sm:text-lg font-semibold text-white">Puertos Abiertos</h2>
+              <span className="ml-auto text-xs sm:text-sm text-slate-500">{data.ports?.length || 0} puertos</span>
             </div>
           </div>
 
@@ -75,9 +75,9 @@ export function ProcessList({ data }: ProcessListProps) {
             <table className="w-full text-sm">
               <thead className="bg-slate-900/50">
                 <tr>
-                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Protocol</th>
-                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Port</th>
-                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider hidden sm:table-cell">Address</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Protocolo</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Puerto</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider hidden sm:table-cell">Dirección</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700/50">

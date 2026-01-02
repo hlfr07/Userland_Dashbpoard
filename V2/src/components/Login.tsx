@@ -26,14 +26,14 @@ export function Login({ onLogin, isLoading, error }: LoginProps) {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl mb-4 shadow-lg">
               <FiUser className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">UserLAnd Dashboard</h1>
-            <p className="text-slate-400">Monitor and control your UserLAnd environment</p>
+            <h1 className="text-3xl font-bold text-white mb-2">Panel de Control UserLAnd</h1>
+            <p className="text-slate-400">Monitorea y controla tu entorno UserLAnd</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Username
+                Nombre de Usuario
               </label>
               <div className="relative">
                 <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
@@ -42,7 +42,7 @@ export function Login({ onLogin, isLoading, error }: LoginProps) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Enter username"
+                  placeholder="Ingresa tu nombre de usuario"
                   required
                   autoComplete="username"
                 />
@@ -51,7 +51,7 @@ export function Login({ onLogin, isLoading, error }: LoginProps) {
 
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Password
+                Contraseña
               </label>
               <div className="relative">
                 <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-500" />
@@ -60,7 +60,7 @@ export function Login({ onLogin, isLoading, error }: LoginProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Enter password"
+                  placeholder="Ingresa tu contraseña"
                   required
                   autoComplete="current-password"
                 />
@@ -79,13 +79,13 @@ export function Login({ onLogin, isLoading, error }: LoginProps) {
               disabled={isLoading}
               className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
-              {isLoading ? 'Connecting...' : 'Connect'}
+              {isLoading ? 'Conectando...' : 'Conectar'}
             </button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-slate-700">
             <p className="text-xs text-slate-500 text-center">
-              Make sure the server is running in your UserLAnd environment
+              Asegúrate de que el servidor esté corriendo en tu entorno UserLAnd
             </p>
           </div>
         </div>

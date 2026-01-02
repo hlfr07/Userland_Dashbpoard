@@ -116,3 +116,16 @@ export interface BatteryInfo {
   temperature: number;
   current: number;
 }
+export interface TemperatureSensor {
+  name: string;
+  temperature: number;
+  type: 'CPU' | 'GPU';
+  status: 'normal' | 'moderate' | 'warning' | 'critical';
+}
+
+export interface TemperatureInfo {
+  isAvailable: boolean;
+  sensors: TemperatureSensor[];
+  averageTemp?: number | string;
+  maxTemp?: number | string;
+}

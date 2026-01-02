@@ -493,3 +493,81 @@ export async function getBatteryInfo() {
   }
 }
 
+export async function getTemperatureInfo() {
+  try {
+    const script = `for z in /sys/class/thermal/thermal_zone*; do
+  type=$(cat "$z/type" 2>/dev/null)
+  temp=$(cat "$z/temp" 2>/dev/null)
+
+  case "$type" in
+    *cpu*|*cpuss*|*gpu*)
+      if [ -n "$temp" ] && [ "$temp" -gt 10000 ] && [ "$temp" -lt 100000 ]; then
+        echo "$type: $(awk "BEGIN {print $temp/1000}") °C"
+      fi
+    ;;
+  esac
+done`;
+
+    const { stdout } = await execAsync(script);
+    
+    if (!stdout || stdout.trim().length === 0) {
+      return {
+        isAvailable: false,
+        sensors: []
+      };
+    }
+
+    const sensors = [];
+    const lines = stdout.trim().split('\n');
+
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      
+      // Parsear línea como "cpuss-0-usr: 45.7 °C"
+      const match = line.match(/^(.+?):\s*([\d.]+)\s*°?C/);
+      if (match) {
+        const name = match[1].trim();
+        const temperature = parseFloat(match[2]);
+        
+        sensors.push({
+          name,
+          temperature,
+          type: name.toLowerCase().includes('gpu') ? 'GPU' : 'CPU',
+          status: getTemperatureStatus(temperature)
+        });
+      }
+    }
+
+    // Ordenar sensores: GPU primero, luego CPU
+    sensors.sort((a, b) => {
+      if (a.type !== b.type) {
+        return a.type === 'GPU' ? -1 : 1;
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+    return {
+      isAvailable: sensors.length > 0,
+      sensors,
+      averageTemp: sensors.length > 0 
+        ? (sensors.reduce((sum, s) => sum + s.temperature, 0) / sensors.length).toFixed(1)
+        : 0,
+      maxTemp: sensors.length > 0 
+        ? Math.max(...sensors.map(s => s.temperature)).toFixed(1)
+        : 0
+    };
+  } catch (error) {
+    console.error('Error getting temperature info:', error.message);
+    return {
+      isAvailable: false,
+      sensors: []
+    };
+  }
+}
+
+function getTemperatureStatus(temp) {
+  if (temp >= 55) return 'critical';
+  if (temp >= 45) return 'warning';
+  if (temp >= 35) return 'moderate';
+  return 'normal';
+}

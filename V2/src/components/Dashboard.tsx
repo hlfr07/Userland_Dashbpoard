@@ -23,13 +23,15 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
     systemData,
     deviceInfo,
     batteryInfo,
+    temperatureInfo,
     isConnected,
     terminalReady,
     createTerminal,
     sendTerminalInput,
     onTerminalData,
     getDeviceInfo,
-    getBatteryInfo
+    getBatteryInfo,
+    getTemperatureInfo
   } = useWebSocket(wsUrl, token);
 
   useEffect(() => {
@@ -37,20 +39,22 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
     if (isConnected) {
       getDeviceInfo();
       getBatteryInfo();
+      getTemperatureInfo();
 
       // Actualizar cada 30 segundos
       const deviceBatteryInterval = setInterval(() => {
         getDeviceInfo();
         getBatteryInfo();
+        getTemperatureInfo();
       }, 30000);
 
       return () => clearInterval(deviceBatteryInterval);
     }
-  }, [isConnected, getDeviceInfo, getBatteryInfo]);
+  }, [isConnected, getDeviceInfo, getBatteryInfo, getTemperatureInfo]);
 
   const navItems = [
-    { id: 'overview' as View, label: 'Overview', icon: FiMonitor },
-    { id: 'processes' as View, label: 'Processes & Ports', icon: FiTerminal },
+    { id: 'overview' as View, label: 'Resumen', icon: FiMonitor },
+    { id: 'processes' as View, label: 'Procesos y Puertos', icon: FiTerminal },
     { id: 'terminal' as View, label: 'Terminal', icon: FiTerminal },
   ];
 
@@ -60,15 +64,15 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex-1">
-              <h1 className="text-xl sm:text-2xl font-bold text-white">UserLAnd Dashboard</h1>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">Connected as {username}</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-white">Panel de Control UserLAnd</h1>
+              <p className="text-xs sm:text-sm text-slate-400 mt-1">Conectado como {username}</p>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
                 <span className="text-xs sm:text-sm text-slate-400">
-                  {isConnected ? 'Connected' : 'Disconnected'}
+                  {isConnected ? 'Conectado' : 'Desconectado'}
                 </span>
               </div>
 
@@ -77,7 +81,7 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
                 className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors border border-slate-700 text-sm"
               >
                 <FiLogOut className="w-4 h-4" />
-                <span>Logout</span>
+                <span>Cerrar Sesión</span>
               </button>
             </div>
           </div>
@@ -106,15 +110,15 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
           <div className="mb-6 flex items-start gap-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
             <FiAlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm text-yellow-300 font-medium">Connection Lost</p>
+              <p className="text-sm text-yellow-300 font-medium">Conexión Perdida</p>
               <p className="text-xs text-yellow-400 mt-1">
-                Attempting to reconnect to the server...
+                Intentando reconectarse al servidor...
               </p>
             </div>
           </div>
         )}
 
-        {currentView === 'overview' && <SystemResources data={systemData} deviceInfo={deviceInfo} batteryInfo={batteryInfo} />}
+        {currentView === 'overview' && <SystemResources data={systemData} deviceInfo={deviceInfo} batteryInfo={batteryInfo} temperatureInfo={temperatureInfo} />}
         {currentView === 'processes' && <ProcessList data={systemData} />}
         {currentView === 'terminal' && (
           <Terminal

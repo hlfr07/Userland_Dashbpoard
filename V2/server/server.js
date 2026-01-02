@@ -158,6 +158,16 @@ app.get('/api/system/battery', authenticateRequest, async (req, res) => {
   }
 });
 
+app.get('/api/system/temperatures', authenticateRequest, async (req, res) => {
+  try {
+    const temperatureInfo = await systemMonitor.getTemperatureInfo();
+    res.json(temperatureInfo);
+  } catch (error) {
+    console.error('API Error /api/system/temperatures:', error);
+    res.status(500).json({ error: error.message, stack: error.stack });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() });
 });

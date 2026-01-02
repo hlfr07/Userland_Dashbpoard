@@ -1,5 +1,5 @@
-import { FiActivity, FiCpu, FiServer, FiTrendingUp, FiZap, FiSmartphone, FiBattery } from 'react-icons/fi';
-import { SystemData, DeviceInfo, BatteryInfo } from '../types/system';
+import { FiActivity, FiCpu, FiServer, FiTrendingUp, FiZap, FiSmartphone, FiBattery, FiThermometer } from 'react-icons/fi';
+import { SystemData, DeviceInfo, BatteryInfo, TemperatureInfo } from '../types/system';
 import { CPUInfoCard } from './charts/CPUInfoCard';
 import { DiskChart } from './charts/DiskChart';
 import { ResourceChart } from './charts/ResourceChart';
@@ -8,8 +8,8 @@ interface SystemResourcesProps {
   data: SystemData | null;
   deviceInfo?: DeviceInfo | null;
   batteryInfo?: BatteryInfo | null;
+  temperatureInfo?: TemperatureInfo | null;
 }
-
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
   const k = 1024;
@@ -56,7 +56,7 @@ function StatMetric({ icon: Icon, label, value, unit, color }: { icon: typeof Fi
   );
 }
 
-export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourcesProps) {
+export function SystemResources({ data, deviceInfo, batteryInfo, temperatureInfo }: SystemResourcesProps) {
   if (!data) {
     return (
       <div className="space-y-6 animate-pulse">
@@ -72,7 +72,7 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
       <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 sm:p-6 lg:p-8 hover:border-slate-600/50 transition-all">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
           <FiServer className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
-          <h2 className="text-lg sm:text-xl font-bold text-white">System Overview</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-white">Resumen del Sistema</h2>
         </div>
 
         {/* Distribución y Kernel */}
@@ -80,7 +80,7 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
           <div className="mb-6 p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Distribution</p>
+                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Distribución</p>
                 <p className="text-sm font-semibold text-white">{data.distro.description}</p>
               </div>
               {data.info?.kernel && (
@@ -94,11 +94,11 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
-          <StatMetric icon={FiServer} label="Hostname" value={data.info?.hostname || 'N/A'} color="cyan" />
-          <StatMetric icon={FiCpu} label="Cores" value={data.info?.cpus || 0} color="blue" />
-          <StatMetric icon={FiActivity} label="Uptime" value={data.info?.uptime ? formatUptime(data.info.uptime) : 'N/A'} color="green" />
-          <StatMetric icon={FiTrendingUp} label="Load 1m" value={data.load?.load1 || '0.00'} color="blue" />
-          <StatMetric icon={FiZap} label="Load 5m" value={data.load?.load5 || '0.00'} color="blue" />
+          <StatMetric icon={FiServer} label="Nombre de Host" value={data.info?.hostname || 'N/A'} color="cyan" />
+          <StatMetric icon={FiCpu} label="Núcleos" value={data.info?.cpus || 0} color="blue" />
+          <StatMetric icon={FiActivity} label="Tiempo de Actividad" value={data.info?.uptime ? formatUptime(data.info.uptime) : 'N/A'} color="green" />
+          <StatMetric icon={FiTrendingUp} label="Carga 1m" value={data.load?.load1 || '0.00'} color="blue" />
+          <StatMetric icon={FiZap} label="Carga 5m" value={data.load?.load5 || '0.00'} color="blue" />
         </div>
       </div>
 
@@ -107,28 +107,28 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
         <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 sm:p-6 lg:p-8 hover:border-slate-600/50 transition-all">
           <div className="flex items-center gap-3 mb-4 sm:mb-6">
             <FiSmartphone className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
-            <h2 className="text-lg sm:text-xl font-bold text-white">Device Information</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-white">Información del Dispositivo</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Manufacturer</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Fabricante</p>
               <p className="text-lg font-semibold text-white">{deviceInfo.manufacturer}</p>
             </div>
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Model</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Modelo</p>
               <p className="text-lg font-semibold text-white">{deviceInfo.model}</p>
             </div>
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Android Version</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Versión de Android</p>
               <p className="text-lg font-semibold text-white">{deviceInfo.androidVersion}</p>
             </div>
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">CPU Architecture</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Arquitectura CPU</p>
               <p className="text-lg font-semibold text-white">{deviceInfo.cpuArchitecture}</p>
             </div>
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Termux Version</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Versión de Termux</p>
               <p className="text-lg font-semibold text-white">{deviceInfo.termuxVersion}</p>
             </div>
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
@@ -153,13 +153,48 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
         <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 sm:p-6 lg:p-8 hover:border-slate-600/50 transition-all">
           <div className="flex items-center gap-3 mb-4 sm:mb-6">
             <FiBattery className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
-            <h2 className="text-lg sm:text-xl font-bold text-white">Battery Status</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-white">Estado de la Batería</h2>
           </div>
+
+          {/* Temperature Warning */}
+          {batteryInfo.temperature >= 45 && (
+            <div className="mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-lg flex items-start gap-3">
+              <span className="text-2xl">🔥</span>
+              <div>
+                <p className="font-semibold text-red-300">¡ALERTA SERIA!</p>
+                <p className="text-sm text-red-200 mt-1">
+                  La temperatura de la batería es crítica ({batteryInfo.temperature.toFixed(1)}°C). Apaga el dispositivo para evitar daños.
+                </p>
+              </div>
+            </div>
+          )}
+          {batteryInfo.temperature >= 40 && batteryInfo.temperature < 45 && (
+            <div className="mb-4 p-4 bg-orange-500/20 border border-orange-500/50 rounded-lg flex items-start gap-3">
+              <span className="text-2xl">⚠️</span>
+              <div>
+                <p className="font-semibold text-orange-300">¡PELIGRO!</p>
+                <p className="text-sm text-orange-200 mt-1">
+                  La temperatura es muy alta ({batteryInfo.temperature.toFixed(1)}°C). Considera usar el dispositivo en un lugar más fresco.
+                </p>
+              </div>
+            </div>
+          )}
+          {batteryInfo.temperature >= 32.8 && batteryInfo.temperature < 40 && (
+            <div className="mb-4 p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-lg flex items-start gap-3">
+              <span className="text-2xl">⚙️</span>
+              <div>
+                <p className="font-semibold text-yellow-300">Temperatura Elevada</p>
+                <p className="text-sm text-yellow-200 mt-1">
+                  La batería está a una temperatura moderadamente alta ({batteryInfo.temperature.toFixed(1)}°C). Monitorea su comportamiento.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Battery Percentage Bar */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-white">Battery Level</span>
+              <span className="text-sm font-semibold text-white">Nivel de Batería</span>
               <span className={`text-2xl font-bold ${
                 batteryInfo.percentage > 50 ? 'text-green-400' : 
                 batteryInfo.percentage > 20 ? 'text-yellow-400' : 
@@ -182,45 +217,82 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Status</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Estado</p>
               <p className="text-lg font-semibold text-white">
-                {batteryInfo.status === 'CHARGING' ? '🔌 Charging' :
-                 batteryInfo.status === 'DISCHARGING' ? '🔋 Discharging' :
-                 batteryInfo.status === 'FULL' ? '✅ Full' :
-                 batteryInfo.status === 'NOT_CHARGING' ? '⏸️ Not Charging' :
+                {batteryInfo.status === 'CHARGING' ? '🔌 Cargando' :
+                 batteryInfo.status === 'DISCHARGING' ? '🔋 Usando Batería' :
+                 batteryInfo.status === 'FULL' ? '✅ Completamente Cargada' :
+                 batteryInfo.status === 'NOT_CHARGING' ? '⏸️ No está Cargando' :
                  batteryInfo.status}
               </p>
             </div>
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Plugged</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Conectada</p>
               <p className="text-lg font-semibold text-white">
-                {batteryInfo.plugged === 'UNPLUGGED' ? '🔌 Unplugged' :
-                 batteryInfo.plugged === 'PLUGGED_AC' ? '🔌 AC' :
+                {batteryInfo.plugged === 'UNPLUGGED' ? '🔌 Desconectada' :
+                 batteryInfo.plugged === 'PLUGGED_AC' ? '🔌 Corriente AC' :
                  batteryInfo.plugged === 'PLUGGED_USB' ? '🔌 USB' :
                  batteryInfo.plugged === 'PLUGGED_WIRELESS' ? '📱 Wireless' :
                  batteryInfo.plugged}
               </p>
             </div>
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Health</p>
-              <p className="text-lg font-semibold text-white">{batteryInfo.health}</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Salud</p>
+              <p className="text-lg font-semibold text-white">
+                {batteryInfo.health === 'GOOD' ? '✨ Buena' :
+                 batteryInfo.health === 'COLD' ? '❄️ Fría' :
+                 batteryInfo.health === 'OVERHEAT' ? '🔥 Sobrecalentada' :
+                 batteryInfo.health === 'DEAD' ? '💀 Muerta' :
+                 batteryInfo.health === 'OVER_VOLTAGE' ? '⚡ Sobrevoltaje' :
+                 batteryInfo.health === 'UNKNOWN' ? '❓ Desconocida' :
+                 batteryInfo.health}
+              </p>
             </div>
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Temperature</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">🌡️ Temperatura</p>
               <p className={`text-lg font-semibold ${
-                batteryInfo.temperature > 40 ? 'text-red-400' :
-                batteryInfo.temperature > 35 ? 'text-yellow-400' :
+                batteryInfo.temperature >= 45 ? 'text-red-400' :
+                batteryInfo.temperature >= 40 ? 'text-orange-400' :
+                batteryInfo.temperature >= 32.8 ? 'text-yellow-400' :
                 'text-green-400'
               }`}>
                 {batteryInfo.temperature.toFixed(1)}°C
               </p>
             </div>
             <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Current</p>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Consumo Actual</p>
               <p className="text-lg font-semibold text-white">
                 {batteryInfo.current < 0 ? 
                   `${Math.abs(batteryInfo.current / 1000).toFixed(0)}mA ↓` : 
                   `${(batteryInfo.current / 1000).toFixed(0)}mA ↑`}
+              </p>
+            </div>
+            <div className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">⏱️ Tiempo Restante</p>
+              <p className="text-lg font-semibold text-white">
+                {batteryInfo.status === 'DISCHARGING' && batteryInfo.current < 0
+                  ? (() => {
+                      // Calcular horas restantes
+                      // current está en microamperios (µA), porcentaje en %
+                      // Asumimos batería típica de ~3000-5000 mAh
+                      const batteryCapacity = 4000; // mAh (estimado promedio)
+                      const currentmA = Math.abs(batteryInfo.current) / 1000; // convertir a mA
+                      const remainingmAh = (batteryInfo.percentage / 100) * batteryCapacity;
+                      const hoursRemaining = currentmA > 0 ? remainingmAh / currentmA : 0;
+                      
+                      if (hoursRemaining < 0.016) {
+                        return '< 1 min';
+                      } else if (hoursRemaining < 1) {
+                        return `${Math.round(hoursRemaining * 60)} min`;
+                      } else if (hoursRemaining < 24) {
+                        return `${hoursRemaining.toFixed(1)}h`;
+                      } else {
+                        return `${(hoursRemaining / 24).toFixed(1)}d`;
+                      }
+                    })()
+                  : batteryInfo.status === 'CHARGING'
+                  ? '⚡ Cargando'
+                  : 'N/A'}
               </p>
             </div>
           </div>
@@ -230,9 +302,84 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
         <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 sm:p-6 lg:p-8 hover:border-slate-600/50 transition-all">
           <div className="flex items-center gap-3 mb-4 sm:mb-6">
             <FiBattery className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
-            <h2 className="text-lg sm:text-xl font-bold text-white">Battery Status</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-white">Estado de la Batería</h2>
           </div>
-          <p className="text-slate-400">Battery information not available on this system</p>
+          <p className="text-slate-400">La información de batería no está disponible en este sistema</p>
+        </div>
+      )}
+      
+      {/* Temperature Info Section */}
+      {temperatureInfo && temperatureInfo.isAvailable && (
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 sm:p-6 lg:p-8 hover:border-slate-600/50 transition-all">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
+            <FiThermometer className="w-5 h-5 sm:w-6 sm:h-6 text-red-400" />
+            <h2 className="text-lg sm:text-xl font-bold text-white">Temperatura de Sensores</h2>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600/30">
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Promedio</p>
+              <p className="text-2xl font-bold text-white">{temperatureInfo.averageTemp}°C</p>
+            </div>
+            <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600/30">
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Máximo</p>
+              <p className="text-2xl font-bold text-red-400">{temperatureInfo.maxTemp}°C</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {temperatureInfo.sensors.map((sensor, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-slate-700/20 rounded-lg border border-slate-600/20">
+                <div className="flex items-center gap-3 flex-1">
+                  <FiThermometer className={`w-5 h-5 ${
+                    sensor.status === 'critical' ? 'text-red-500' :
+                    sensor.status === 'warning' ? 'text-orange-500' :
+                    sensor.status === 'moderate' ? 'text-yellow-500' :
+                    'text-green-500'
+                  }`} />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-white">{sensor.name}</p>
+                    <p className="text-xs text-slate-400">{sensor.type}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className={`text-lg font-bold ${
+                    sensor.status === 'critical' ? 'text-red-400' :
+                    sensor.status === 'warning' ? 'text-orange-400' :
+                    sensor.status === 'moderate' ? 'text-yellow-400' :
+                    'text-green-400'
+                  }`}>
+                    {sensor.temperature.toFixed(1)}°C
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {sensor.status === 'critical' ? '¡Crítico!' :
+                     sensor.status === 'warning' ? 'Alerta' :
+                     sensor.status === 'moderate' ? 'Moderado' :
+                     'Normal'}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {temperatureInfo && !temperatureInfo.isAvailable && (
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 sm:p-6 lg:p-8 hover:border-slate-600/50 transition-all">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
+            <FiThermometer className="w-5 h-5 sm:w-6 sm:h-6 text-red-400" />
+            <h2 className="text-lg sm:text-xl font-bold text-white">Temperatura de Sensores</h2>
+          </div>
+          <p className="text-slate-400">La información de temperatura no está disponible en este sistema</p>
+        </div>
+      )}
+
+      {deviceInfo && !deviceInfo.isTermux && (
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 sm:p-6 lg:p-8 hover:border-slate-600/50 transition-all">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
+            <FiSmartphone className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
+            <h2 className="text-lg sm:text-xl font-bold text-white">Información del Dispositivo</h2>
+          </div>
+          <p className="text-slate-400">No se está ejecutando en un entorno Termux</p>
         </div>
       )}
 
@@ -240,7 +387,7 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
         <div className="lg:col-span-2 order-2 lg:order-1">
           <ResourceChart
             data={data.cpuHistory || []}
-            title="CPU Usage Over Time"
+            title="Uso de CPU a lo Largo del Tiempo"
             color="#3b82f6"
           />
         </div>
@@ -248,7 +395,7 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
           <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-sm border border-blue-500/20 rounded-xl p-4 sm:p-6 hover:border-blue-500/30 transition-all h-full flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-3 sm:mb-4">
               <FiCpu className="w-5 h-5 text-blue-400" />
-              <h3 className="text-sm font-semibold text-slate-300">Current CPU</h3>
+              <h3 className="text-sm font-semibold text-slate-300">CPU Actual</h3>
             </div>
             <div className="text-3xl sm:text-4xl font-bold text-blue-400 mb-2">{data.cpu?.toFixed(1) || 0}%</div>
             <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
@@ -265,7 +412,7 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
         <div className="lg:col-span-2 order-2 lg:order-1">
           <ResourceChart
             data={data.memoryHistory || []}
-            title="Memory Usage Over Time"
+            title="Uso de Memoria a lo Largo del Tiempo"
             color="#10b981"
           />
         </div>
@@ -273,7 +420,7 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
           <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-sm border border-green-500/20 rounded-xl p-4 sm:p-6 hover:border-green-500/30 transition-all h-full flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-3 sm:mb-4">
               <FiActivity className="w-5 h-5 text-green-400" />
-              <h3 className="text-sm font-semibold text-slate-300">Current RAM</h3>
+              <h3 className="text-sm font-semibold text-slate-300">RAM Actual</h3>
             </div>
             <div className="text-3xl sm:text-4xl font-bold text-green-400 mb-2">{data.memory?.usagePercent?.toFixed(1) || 0}%</div>
             <p className="text-xs text-slate-400 mb-3">{formatBytes(data.memory?.used || 0)} / {formatBytes(data.memory?.total || 0)}</p>
@@ -298,7 +445,7 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
         <div className="lg:col-span-2 order-2">
           <ResourceChart
             data={data.diskHistory || []}
-            title="Disk Usage Over Time"
+            title="Uso de Disco a lo Largo del Tiempo"
             color="#f59e0b"
           />
         </div>
@@ -308,15 +455,15 @@ export function SystemResources({ data, deviceInfo, batteryInfo }: SystemResourc
         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 sm:p-6 hover:border-slate-600/50 transition-all">
           <div className="flex items-center gap-3 mb-4">
             <FiActivity className="w-5 h-5 text-amber-400" />
-            <h3 className="text-sm font-semibold text-slate-300">Swap Memory</h3>
+            <h3 className="text-sm font-semibold text-slate-300">Memoria Swap</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <p className="text-xs text-slate-500 mb-2">Usage</p>
+              <p className="text-xs text-slate-500 mb-2">Uso</p>
               <p className="text-xl sm:text-2xl font-bold text-amber-400">{data.swap.usagePercent.toFixed(1)}%</p>
             </div>
             <div>
-              <p className="text-xs text-slate-500 mb-2">Used</p>
+              <p className="text-xs text-slate-500 mb-2">Usado</p>
               <p className="text-sm font-semibold text-white">{formatBytes(data.swap.used)}</p>
             </div>
             <div>
