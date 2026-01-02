@@ -18,22 +18,27 @@ function addToHistory(array, value) {
   }
 }
 
-export async function getCPUUsage() {
-  try {
-    // Usar nproc y calcular porcentaje basado en load average
-    const loadavg = os.loadavg();
-    const { stdout: nprocOut } = await execAsync('nproc');
-    const cores = parseInt(nprocOut.trim());
+let lastCpu = os.cpus();
 
-    // Calcular CPU usage como porcentaje del load promedio
-    const cpuUsage = (loadavg[0] / cores) * 100;
-    return Math.min(100, Math.max(0, cpuUsage));
-  } catch (error) {
-    // Fallback a método alternativo
-    const loadavg = os.loadavg();
-    const cpus = os.cpus().length;
-    return Math.min(100, (loadavg[0] / cpus) * 100);
-  }
+export function getCPUUsage() {
+  const current = os.cpus();
+
+  let idle = 0;
+  let total = 0;
+
+  current.forEach((cpu, i) => {
+    const prev = lastCpu[i];
+
+    const prevTotal = Object.values(prev.times).reduce((a, b) => a + b, 0);
+    const currTotal = Object.values(cpu.times).reduce((a, b) => a + b, 0);
+
+    total += currTotal - prevTotal;
+    idle += cpu.times.idle - prev.times.idle;
+  });
+
+  lastCpu = current;
+
+  return Math.round(100 - (idle / total) * 100);
 }
 
 export async function getMemoryUsage() {
@@ -392,7 +397,7 @@ export async function getDeviceInfo() {
         termuxVersion: 'Unknown'
       };
     }
-    
+
     const info = {
       isTermux: true,
       manufacturer: 'Unknown',
@@ -469,7 +474,7 @@ export async function getBatteryInfo() {
 
     // Parsear JSON de la salida
     const batteryData = JSON.parse(stdout.trim());
-    
+
     return {
       isAvailable: true,
       percentage: batteryData.percentage || 0,
@@ -509,7 +514,7 @@ export async function getTemperatureInfo() {
 done`;
 
     const { stdout } = await execAsync(script);
-    
+
     if (!stdout || stdout.trim().length === 0) {
       return {
         isAvailable: false,
@@ -522,13 +527,13 @@ done`;
 
     for (const line of lines) {
       if (!line.trim()) continue;
-      
+
       // Parsear línea como "cpuss-0-usr: 45.7 °C"
       const match = line.match(/^(.+?):\s*([\d.]+)\s*°?C/);
       if (match) {
         const name = match[1].trim();
         const temperature = parseFloat(match[2]);
-        
+
         sensors.push({
           name,
           temperature,
@@ -549,10 +554,10 @@ done`;
     return {
       isAvailable: sensors.length > 0,
       sensors,
-      averageTemp: sensors.length > 0 
+      averageTemp: sensors.length > 0
         ? (sensors.reduce((sum, s) => sum + s.temperature, 0) / sensors.length).toFixed(1)
         : 0,
-      maxTemp: sensors.length > 0 
+      maxTemp: sensors.length > 0
         ? Math.max(...sensors.map(s => s.temperature)).toFixed(1)
         : 0
     };
