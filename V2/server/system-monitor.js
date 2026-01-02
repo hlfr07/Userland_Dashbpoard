@@ -38,27 +38,27 @@ export async function getCPUUsage() {
 
 export async function getMemoryUsage() {
   try {
-    // Usar free -b para obtener valores en bytes
-    const { stdout } = await execAsync("free -b | grep Mem | awk '{print $2,$3,$4}'");
-    const [total, used, free] = stdout.trim().split(' ').map(Number);
+    const { stdout } = await execAsync(
+      `free -b | awk '/Mem:/ {print $2,$7}'`
+    );
+
+    const [total, available] = stdout.trim().split(/\s+/).map(Number);
+
+    const used = total - available;
 
     return {
       total,
       used,
-      free,
-      usagePercent: (used / total) * 100
+      free: available,
+      usagePercent: Number(((used / total) * 100).toFixed(1))
     };
-  } catch (error) {
-    // Fallback a os.totalmem/freemem
-    const totalMem = os.totalmem();
-    const freeMem = os.freemem();
-    const usedMem = totalMem - freeMem;
-
+  } catch (err) {
+    console.error('RAM error:', err.message);
     return {
-      total: totalMem,
-      used: usedMem,
-      free: freeMem,
-      usagePercent: (usedMem / totalMem) * 100
+      total: 0,
+      used: 0,
+      free: 0,
+      usagePercent: 0
     };
   }
 }
