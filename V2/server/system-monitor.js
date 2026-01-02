@@ -18,6 +18,8 @@ function addToHistory(array, value) {
   }
 }
 
+let lastCpu = os.cpus();
+
 export function getCPUUsage() {
   const current = os.cpus();
 
