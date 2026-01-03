@@ -18,7 +18,7 @@ type View = 'overview' | 'processes' | 'terminal' | 'proot';
 export function Dashboard({ serverUrl, token, username, onLogout }: DashboardProps) {
   const [currentView, setCurrentView] = useState<View>('overview');
   const [distroName, setDistroName] = useState('');
-  const [distroPort, setDistroPort] = useState('8022');
+  const [distroPort, setDistroPort] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [createSuccess, setCreateSuccess] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
