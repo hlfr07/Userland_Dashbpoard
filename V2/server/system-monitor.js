@@ -581,7 +581,7 @@ export async function createProotDistro(name, port) {
   const distroBase = 'ubuntu';
   const distroName = `${distroBase}-${name}-${port}`;
 
-  const PREFIX = process.env.PREFIX;
+  const PREFIX = '$PREFIX'; // Variable de entorno de Termux
   if (!PREFIX) {
     throw new Error('PREFIX not found. Are you running inside Termux?');
   }
