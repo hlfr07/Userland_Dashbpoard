@@ -181,6 +181,17 @@ app.post('/api/proot/create', authenticateRequest, async (req, res) => {
   }
 });
 
+//Ahora haremos un get para tarer los proots creados
+app.get('/api/proot/list', authenticateRequest, async (req, res) => {
+  try {
+    const distros = await systemMonitor.listProotDistros();
+    res.json(distros);
+  } catch (error) {
+    console.error('Error listing proot distros:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() });
 });

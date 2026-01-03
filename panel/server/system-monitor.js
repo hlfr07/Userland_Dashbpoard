@@ -600,3 +600,28 @@ EOF
   };
 }
 
+export async function listProotDistros() {
+  try {
+    const { stdout } = await execAsync('proot-distro list');
+    const lines = stdout.trim().split('\n');
+
+    // Filtramos solo las distros que siguen el patrón ubuntu-node-<puerto>
+    const distros = lines.slice(1).map(line => {
+      const match = line.match(/(ubuntu-[\w-]+)-(\d+)/);
+      if (match) {
+        return {
+          nombre: match[1], // ej. "ubuntu-node"
+          puerto: match[2]  // ej. "3000"
+        };
+      }
+      return null;
+    }).filter(Boolean); // eliminamos los nulls
+
+    return distros;
+  } catch (error) {
+    console.error('Error listing proot distros:', error.message);
+    return [];
+  }
+}
+
+
