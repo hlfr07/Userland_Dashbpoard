@@ -605,15 +605,11 @@ export async function listProotDistros() {
     // Capturamos stdout y stderr
     const { stdout, stderr } = await execAsync('proot-distro list');
     const output = stdout + stderr; // combinamos por si aparece en stderr
-    console.log('proot-distro list output:', output);
 
     const lines = output.trim().split('\n').filter(Boolean);
-    console.log('proot-distro list lines:', lines);
 
     const distros = lines.map(line => {
-      console.log('Parsing line:', line);
       const match = line.match(/(ubuntu-[\w-]+)-(\d+)/);
-      console.log('Match result:', match);
       if (match) {
         return {
           nombreCompleto: match[0], // ej. "ubuntu-node-3000"
@@ -624,7 +620,6 @@ export async function listProotDistros() {
       return null;
     }).filter(Boolean);
 
-    console.log('Parsed proot distros:', distros);
     return distros;
   } catch (error) {
     console.error('Error listing proot distros:', error.message);

@@ -3,6 +3,7 @@ import { FiLogOut, FiMonitor, FiTerminal, FiAlertCircle, FiPlusCircle } from 're
 import { SystemResources } from './SystemResources';
 import { ProcessList } from './ProcessList';
 import { Terminal } from './Terminal';
+import ProotList from './ProotList';
 import { useWebSocket } from '../hooks/useWebSocket';
 
 interface DashboardProps {
@@ -240,6 +241,8 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
                 <span className="font-semibold">Error:</span> {createError}
               </div>
             )}
+            
+            <ProotList serverUrl={serverUrl} token={token} />
           </div>
         )}
       </main>
