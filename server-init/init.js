@@ -18,29 +18,36 @@ async function ensureCommand(cmd, installCmd) {
     }
 }
 
-function ask(question, hidden = false) {
+function ask(question) {
     return new Promise((resolve) => {
-        // mostramos el label ANTES
-        process.stdout.write(question);
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
 
+        rl.question(question, (answer) => {
+            rl.close();
+            resolve(answer.trim());
+        });
+    });
+}
+
+function askHidden() {
+    return new Promise((resolve) => {
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
             terminal: true
         });
 
-        if (hidden) {
-            rl.stdoutMuted = true;
-
-            rl._writeToOutput = function (stringToWrite) {
-                if (rl.stdoutMuted) {
-                    // solo ocultar lo que escribe el usuario
-                    rl.output.write('*');
-                } else {
-                    rl.output.write(stringToWrite);
-                }
-            };
-        }
+        rl.stdoutMuted = true;
+        rl._writeToOutput = function (stringToWrite) {
+            if (rl.stdoutMuted) {
+                rl.output.write('*');
+            } else {
+                rl.output.write(stringToWrite);
+            }
+        };
 
         rl.question('', (answer) => {
             rl.close();
@@ -49,6 +56,7 @@ function ask(question, hidden = false) {
         });
     });
 }
+
 
 /* =========================
    INIT
@@ -135,8 +143,11 @@ export async function initServer() {
         throw new Error('❌ El usuario no puede estar vacío');
     }
 
-    const pass1 = await ask('🔑 Password ttyd: ', true);
-    const pass2 = await ask('🔁 Confirmar password: ', true);
+    console.log('\n🔑 Por favor ingrese su password');
+    const pass1 = await askHidden();
+
+    console.log('🔁 Confirme su password');
+    const pass2 = await askHidden();
 
     if (!pass1 || !pass2) {
         throw new Error('❌ El password no puede estar vacío');
@@ -146,12 +157,11 @@ export async function initServer() {
         throw new Error('❌ Los passwords no coinciden');
     }
 
-    if (pass1.length < 6) {
-        throw new Error('❌ Password muy corto (mínimo 6 caracteres)');
-    }
+    // if (pass1.length < 6) {
+    //     throw new Error('❌ Password muy corto (mínimo 6 caracteres)');
+    // }
 
     const pass = pass1;
-
 
     /* 9️⃣ Levantar ttyd */
     console.log('\n🖥 Starting ttyd on port 7681...');
