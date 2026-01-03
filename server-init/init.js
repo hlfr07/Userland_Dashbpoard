@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 import { promisify } from 'util';
 import readline from 'readline';
 
@@ -165,12 +165,15 @@ export async function initServer() {
 
     /* 9️⃣ Levantar ttyd */
     console.log('\n🖥 Starting ttyd on port 7681...');
-    await execAsync(`
-    pgrep ttyd || ttyd \
-      -p 7681 \
-      -c ${user}:${pass} \
-      bash
-  `);
+    spawn('ttyd', [
+        '-W',
+        '-p', '7681',
+        '-c', `${user}:${pass}`,
+        'bash', '-l'
+    ], {
+        detached: true,
+        stdio: 'ignore'
+    }).unref();
 
     console.log('\n🎉 Userland environment READY');
     console.log('🌐 Web terminal: http://localhost:7681');
