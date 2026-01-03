@@ -140,11 +140,10 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
               <button
                 key={item.id}
                 onClick={() => setCurrentView(item.id)}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap text-sm ${
-                  currentView === item.id
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap text-sm ${currentView === item.id
                     ? 'bg-blue-500 text-white shadow-lg'
                     : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-300'
-                }`}
+                  }`}
               >
                 <item.icon className="w-4 h-4" />
                 <span>{item.label}</span>
@@ -213,7 +212,14 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
                   disabled={isCreating}
                   className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-md transition disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isCreating ? 'Creando...' : 'Crear instancia'}
+                  {isCreating ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Creando...</span>
+                    </>
+                  ) : (
+                    'Crear instancia'
+                  )}
                 </button>
                 <button
                   type="button"
@@ -241,7 +247,7 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
                 <span className="font-semibold">Error:</span> {createError}
               </div>
             )}
-            
+
             <ProotList serverUrl={serverUrl} token={token} />
           </div>
         )}

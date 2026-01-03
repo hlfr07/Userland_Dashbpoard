@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { SkeletonCard } from './LoadingSpinner';
 
 interface ProotEntry {
   nombreCompleto: string;
@@ -60,10 +61,15 @@ export default function ProotList({ serverUrl, token }: ProotListProps) {
         </div>
       </div>
 
-      {loading && <p className="text-sm text-slate-400">Cargando...</p>}
       {error && <p className="text-sm text-red-400">{error}</p>}
 
-      {!loading && !error && (
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {items && items.length > 0 ? (
             items.map((item) => (
