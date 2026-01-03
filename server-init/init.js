@@ -163,6 +163,9 @@ export async function initServer() {
 
     const pass = pass1;
 
+    //Antes de todo haremos por seacaso un kill de ttyd
+    await execAsync('pkill ttyd || echo "ttyd no estaba corriendo"');
+
     /* 9️⃣ Levantar ttyd */
     console.log('\n🖥 Starting ttyd on port 7681...');
     spawn('ttyd', [
@@ -171,6 +174,7 @@ export async function initServer() {
         '-c', `${user}:${pass}`,
         'bash', '-l'
     ], {
+        cwd: process.env.HOME,   // 👈 se va directo al HOME
         detached: true,
         stdio: 'ignore'
     }).unref();
