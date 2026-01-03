@@ -1,7 +1,12 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import readline from 'readline';
 
 const execAsync = promisify(exec);
+
+/* =========================
+   Helpers
+========================= */
 
 async function ensureCommand(cmd, installCmd) {
   try {
@@ -13,28 +18,56 @@ async function ensureCommand(cmd, installCmd) {
   }
 }
 
+function ask(question, hidden = false) {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+
+    if (hidden) {
+      rl.stdoutMuted = true;
+      rl._writeToOutput = function (stringToWrite) {
+        if (rl.stdoutMuted) rl.output.write('*');
+        else rl.output.write(stringToWrite);
+      };
+    }
+
+    rl.question(question, (answer) => {
+      rl.close();
+      console.log();
+      resolve(answer.trim());
+    });
+  });
+}
+
+/* =========================
+   INIT
+========================= */
+
 export async function initServer() {
   console.log('🚀 Bootstrapping Userland environment...\n');
 
-  // 0️⃣ Verificar Termux
+  /* 0️⃣ Verificar Termux */
   try {
     await execAsync('command -v pkg');
   } catch {
     throw new Error('❌ This installer must be run inside Termux');
   }
 
-  // 1️⃣ Dependencias básicas
+  /* 1️⃣ Dependencias base */
   await ensureCommand('curl', 'pkg install -y curl');
   await ensureCommand('tar', 'pkg install -y tar');
   await ensureCommand('proot-distro', 'pkg install -y proot-distro');
+  await ensureCommand('ttyd', 'pkg install -y ttyd');
 
-  // 2️⃣ termux-api (para batería, sensores, etc.)
+  /* 2️⃣ termux-api */
   await ensureCommand(
     'termux-battery-status',
     'pkg install -y termux-api'
   );
 
-  // 3️⃣ Verificar installed-rootfs
+  /* 3️⃣ Verificar rootfs */
   let hasRootfs = true;
   try {
     await execAsync('ls $PREFIX/var/lib/proot-distro/installed-rootfs');
@@ -42,7 +75,7 @@ export async function initServer() {
     hasRootfs = false;
   }
 
-  // 4️⃣ Si no hay ninguna distro → instalar alpine
+  /* 4️⃣ Instalar alpine si no hay nada */
   if (!hasRootfs) {
     console.log('📦 No distro found. Installing base alpine...');
     await execAsync('proot-distro install alpine');
@@ -50,7 +83,7 @@ export async function initServer() {
     console.log('✅ installed-rootfs exists');
   }
 
-  // 5️⃣ Descargar ubuntu.tar.gz
+  /* 5️⃣ Descargar ubuntu.tar.gz */
   await execAsync(`
     cd $PREFIX/var/lib/proot-distro/installed-rootfs || exit 1
 
@@ -63,7 +96,7 @@ export async function initServer() {
     fi
   `);
 
-  // 6️⃣ Extraer ubuntu
+  /* 6️⃣ Extraer ubuntu */
   await execAsync(`
     cd $PREFIX/var/lib/proot-distro/installed-rootfs || exit 1
 
@@ -75,15 +108,36 @@ export async function initServer() {
     fi
   `);
 
-  // 7️⃣ Verificación suave de termux-api app
+  /* 7️⃣ Verificar termux-api app */
   try {
     await execAsync('termux-battery-status');
     console.log('🔋 termux-battery-status working');
   } catch {
-    console.log(
-      '⚠️ termux-api package installed, but Termux:API app may be missing'
-    );
+    console.log('⚠️ termux-api installed, but Termux:API app may be missing');
   }
 
+  /* 8️⃣ Credenciales ttyd */
+  console.log('\n🔐 Web Terminal protection');
+  const user = await ask('👤 Usuario ttyd: ');
+  const pass = await ask('🔑 Password ttyd: ', true);
+
+  if (!user || !pass) {
+    throw new Error('❌ Usuario y password no pueden estar vacíos');
+  }
+
+  if (pass.length < 6) {
+    throw new Error('❌ Password muy corto (mínimo 6)');
+  }
+
+  /* 9️⃣ Levantar ttyd */
+  console.log('\n🖥 Starting ttyd on port 7681...');
+  await execAsync(`
+    pgrep ttyd || ttyd \
+      -p 7681 \
+      -c ${user}:${pass} \
+      bash
+  `);
+
   console.log('\n🎉 Userland environment READY');
+  console.log('🌐 Web terminal: http://localhost:7681');
 }
