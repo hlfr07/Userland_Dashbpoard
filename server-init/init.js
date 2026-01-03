@@ -16,19 +16,25 @@ async function ensureCommand(cmd, installCmd) {
 export async function initServer() {
   console.log('🚀 Bootstrapping Userland environment...\n');
 
-  // 0️⃣ Termux check
+  // 0️⃣ Verificar Termux
   try {
     await execAsync('command -v pkg');
   } catch {
-    throw new Error('❌ This must be run inside Termux');
+    throw new Error('❌ This installer must be run inside Termux');
   }
 
-  // 1️⃣ Dependencias base
+  // 1️⃣ Dependencias básicas
   await ensureCommand('curl', 'pkg install -y curl');
   await ensureCommand('tar', 'pkg install -y tar');
   await ensureCommand('proot-distro', 'pkg install -y proot-distro');
 
-  // 2️⃣ ¿Existe installed-rootfs?
+  // 2️⃣ termux-api (para batería, sensores, etc.)
+  await ensureCommand(
+    'termux-battery-status',
+    'pkg install -y termux-api'
+  );
+
+  // 3️⃣ Verificar installed-rootfs
   let hasRootfs = true;
   try {
     await execAsync('ls $PREFIX/var/lib/proot-distro/installed-rootfs');
@@ -36,7 +42,7 @@ export async function initServer() {
     hasRootfs = false;
   }
 
-  // 3️⃣ Si NO existe → instalar alpine
+  // 4️⃣ Si no hay ninguna distro → instalar alpine
   if (!hasRootfs) {
     console.log('📦 No distro found. Installing base alpine...');
     await execAsync('proot-distro install alpine');
@@ -44,7 +50,7 @@ export async function initServer() {
     console.log('✅ installed-rootfs exists');
   }
 
-  // 4️⃣ Descargar ubuntu.tar.gz
+  // 5️⃣ Descargar ubuntu.tar.gz
   await execAsync(`
     cd $PREFIX/var/lib/proot-distro/installed-rootfs || exit 1
 
@@ -57,7 +63,7 @@ export async function initServer() {
     fi
   `);
 
-  // 5️⃣ Extraer ubuntu
+  // 6️⃣ Extraer ubuntu
   await execAsync(`
     cd $PREFIX/var/lib/proot-distro/installed-rootfs || exit 1
 
@@ -68,6 +74,16 @@ export async function initServer() {
       echo "✅ ubuntu already extracted"
     fi
   `);
+
+  // 7️⃣ Verificación suave de termux-api app
+  try {
+    await execAsync('termux-battery-status');
+    console.log('🔋 termux-battery-status working');
+  } catch {
+    console.log(
+      '⚠️ termux-api package installed, but Termux:API app may be missing'
+    );
+  }
 
   console.log('\n🎉 Userland environment READY');
 }
