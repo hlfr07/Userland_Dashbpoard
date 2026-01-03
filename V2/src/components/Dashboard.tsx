@@ -12,11 +12,10 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
-type View = 'overview' | 'processes' | 'terminal';
+type View = 'overview' | 'processes' | 'terminal' | 'proot';
 
 export function Dashboard({ serverUrl, token, username, onLogout }: DashboardProps) {
   const [currentView, setCurrentView] = useState<View>('overview');
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [distroName, setDistroName] = useState('');
   const [distroPort, setDistroPort] = useState('8022');
   const [isCreating, setIsCreating] = useState(false);
@@ -62,6 +61,7 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
     { id: 'overview' as View, label: 'Resumen', icon: FiMonitor },
     { id: 'processes' as View, label: 'Procesos y Puertos', icon: FiTerminal },
     { id: 'terminal' as View, label: 'Terminal', icon: FiTerminal },
+    { id: 'proot' as View, label: 'Crear instancia', icon: FiPlusCircle },
   ];
 
   const handleCreateInstance = async (event: FormEvent<HTMLFormElement>) => {
@@ -149,71 +149,7 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
                 <span>{item.label}</span>
               </button>
             ))}
-
-            <button
-              onClick={() => setIsCreateOpen((prev) => !prev)}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all whitespace-nowrap text-sm bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-lg hover:from-emerald-600 hover:to-cyan-600"
-            >
-              <FiPlusCircle className="w-4 h-4" />
-              <span>Crear instancia</span>
-            </button>
           </nav>
-
-          {isCreateOpen && (
-            <div className="mt-4 bg-slate-800/70 border border-slate-700/60 rounded-lg p-4 space-y-3">
-              <form onSubmit={handleCreateInstance} className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-slate-300">Nombre de la instancia</label>
-                  <input
-                    value={distroName}
-                    onChange={(e) => setDistroName(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="ej: ubuntu-proot"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-slate-300">Puerto</label>
-                  <input
-                    value={distroPort}
-                    onChange={(e) => setDistroPort(e.target.value.replace(/[^0-9]/g, ''))}
-                    className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="8022"
-                    inputMode="numeric"
-                  />
-                </div>
-
-                <div className="flex gap-2 md:justify-end">
-                  <button
-                    type="submit"
-                    disabled={isCreating}
-                    className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-md transition disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {isCreating ? 'Creando...' : 'Crear'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsCreateOpen(false)}
-                    className="flex-1 md:flex-none px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-md transition"
-                  >
-                    Cerrar
-                  </button>
-                </div>
-              </form>
-
-              {createSuccess && (
-                <div className="flex items-start gap-2 p-3 rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-sm">
-                  <span className="font-semibold">Éxito:</span> {createSuccess}
-                </div>
-              )}
-
-              {createError && (
-                <div className="flex items-start gap-2 p-3 rounded-md border border-red-500/40 bg-red-500/10 text-red-200 text-sm">
-                  <span className="font-semibold">Error:</span> {createError}
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </header>
 
@@ -240,6 +176,71 @@ export function Dashboard({ serverUrl, token, username, onLogout }: DashboardPro
             isReady={terminalReady}
             isConnected={isConnected}
           />
+        )}
+        {currentView === 'proot' && (
+          <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 sm:p-6 space-y-4">
+            <div>
+              <h2 className="text-xl font-bold text-white">Crear nueva instancia proot</h2>
+              <p className="text-sm text-slate-400 mt-1">Define un nombre y puerto para lanzar la distro.</p>
+            </div>
+
+            <form onSubmit={handleCreateInstance} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-slate-300">Nombre de la instancia</label>
+                <input
+                  value={distroName}
+                  onChange={(e) => setDistroName(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="ej: ubuntu-proot"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold text-slate-300">Puerto</label>
+                <input
+                  value={distroPort}
+                  onChange={(e) => setDistroPort(e.target.value.replace(/[^0-9]/g, ''))}
+                  className="w-full px-3 py-2 bg-slate-900/60 border border-slate-700 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="8022"
+                  inputMode="numeric"
+                />
+              </div>
+
+              <div className="flex gap-2 md:justify-end">
+                <button
+                  type="submit"
+                  disabled={isCreating}
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-md transition disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isCreating ? 'Creando...' : 'Crear instancia'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDistroName('');
+                    setDistroPort('8022');
+                    setCreateError(null);
+                    setCreateSuccess(null);
+                  }}
+                  className="flex-1 md:flex-none px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-md transition"
+                >
+                  Limpiar
+                </button>
+              </div>
+            </form>
+
+            {createSuccess && (
+              <div className="flex items-start gap-2 p-3 rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-sm">
+                <span className="font-semibold">Éxito:</span> {createSuccess}
+              </div>
+            )}
+
+            {createError && (
+              <div className="flex items-start gap-2 p-3 rounded-md border border-red-500/40 bg-red-500/10 text-red-200 text-sm">
+                <span className="font-semibold">Error:</span> {createError}
+              </div>
+            )}
+          </div>
         )}
       </main>
     </div>

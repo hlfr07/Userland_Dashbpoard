@@ -573,6 +573,7 @@ function getTemperatureStatus(temp) {
 }
 
 export async function createProotDistro(name, port) {
+  console.log('Creating proot distro:', name, port);
   if (!name || !port) {
     throw new Error('name and port are required');
   }
