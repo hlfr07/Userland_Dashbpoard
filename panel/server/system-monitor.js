@@ -603,11 +603,14 @@ EOF
 export async function listProotDistros() {
   try {
     const { stdout } = await execAsync('proot-distro list');
+    console.log('proot-distro list output:', stdout);
     const lines = stdout.trim().split('\n');
-
+console.log('proot-distro list lines:', lines);
     // Filtramos solo las distros que siguen el patrón ubuntu-node-<puerto>
     const distros = lines.slice(1).map(line => {
+      console.log('Parsing line:', line);
       const match = line.match(/(ubuntu-[\w-]+)-(\d+)/);
+      console.log('Match result:', match);
       if (match) {
         return {
           nombre: match[1], // ej. "ubuntu-node"
@@ -616,6 +619,8 @@ export async function listProotDistros() {
       }
       return null;
     }).filter(Boolean); // eliminamos los nulls
+
+    console.log('Parsed proot distros:', distros);
 
     return distros;
   } catch (error) {
