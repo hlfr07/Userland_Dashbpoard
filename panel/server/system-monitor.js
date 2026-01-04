@@ -594,11 +594,31 @@ TARBALL_URL=""
 EOF
   `);
 
+
+
   return {
     distro: distroName,
     message: 'Proot distro created successfully'
   };
 }
+
+export async function deleteProotDistro(nombreCompleto) {
+  if (!nombreCompleto) {
+    throw new Error('nombreCompleto is required');
+  }
+
+  await execAsync(`
+    screen -S ${nombreCompleto} -X quit 2>/dev/null || true
+    rm -rf $PREFIX/var/lib/proot-distro/installed-rootfs/${nombreCompleto}
+    rm -f $PREFIX/etc/proot-distro/${nombreCompleto}.sh
+  `);
+
+  return {
+    distro: nombreCompleto,
+    message: 'Proot distro deleted successfully'
+  };
+}
+
 
 export async function listProotDistros() {
   try {

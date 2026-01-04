@@ -181,6 +181,17 @@ app.post('/api/proot/create', authenticateRequest, async (req, res) => {
   }
 });
 
+app.delete('/api/proot/delete/:name', authenticateRequest, async (req, res) => {
+  const distroName = req.params.name;
+  try {
+    const result = await systemMonitor.deleteProotDistro(distroName);
+    res.json(result);
+  } catch (error) {
+    console.error('Error deleting proot distro:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 //Ahora haremos un get para tarer los proots creados
 app.get('/api/proot/list', authenticateRequest, async (req, res) => {
   try {
